@@ -14,7 +14,7 @@ unsigned char* Encryption::encryptString(unsigned char* passwd, unsigned char* p
 
     const EVP_CIPHER *cipher = EVP_aes_128_cbc();
 
-    unsigned char *key1 = new unsigned char[16];
+    unsigned char key1[16];
 
     generateKey(passwd, std::strlen((const char*)passwd), key1);
 
@@ -31,8 +31,6 @@ unsigned char* Encryption::encryptString(unsigned char* passwd, unsigned char* p
 
     *len = outlen + flen;
 
-    delete[] key1;
-
     return out;
 }
 
@@ -42,7 +40,7 @@ unsigned char* Encryption::decryptString(unsigned char* passwd, unsigned char* d
     EVP_CIPHER_CTX_init(&ctx);
 
     const EVP_CIPHER *cipher = EVP_aes_128_cbc();
-    unsigned char *key1 = new unsigned char[16];
+    unsigned char key1[16];
 
     generateKey(passwd, std::strlen((const char*)passwd), key1);
 
@@ -59,13 +57,12 @@ unsigned char* Encryption::decryptString(unsigned char* passwd, unsigned char* d
 
     *len = outlen + flen;
 
-    delete[] key1;
     return out;
 }
 
 void Encryption::generateKey(unsigned char *passwd, int passlen, unsigned char *key)
 {
-    const unsigned char salt[] = "ThisIsSomeRandomSalt"; // len 20
+    const unsigned char salt[] = "ThisIsSomeRandomSalt";
     const int saltlen = 20;
     int iter = 10000;
     int keylen = 16; // For 128 bit encryption
