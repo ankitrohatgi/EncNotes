@@ -7,7 +7,7 @@ Encryption::Encryption()
 {
 }
 
-unsigned char* Encryption::encryptString(unsigned char* passwd, unsigned char* plainText, int *len)
+unsigned char* Encryption::encryptString(std::string passwd, unsigned char* plainText, int *len)
 {
     EVP_CIPHER_CTX ctx;
     EVP_CIPHER_CTX_init(&ctx);
@@ -16,7 +16,7 @@ unsigned char* Encryption::encryptString(unsigned char* passwd, unsigned char* p
 
     unsigned char key1[16];
 
-    generateKey(passwd, std::strlen((const char*)passwd), key1);
+    generateKey(passwd, key1);
 
     EVP_EncryptInit(&ctx, cipher, key1, key1);
 
@@ -34,7 +34,7 @@ unsigned char* Encryption::encryptString(unsigned char* passwd, unsigned char* p
     return out;
 }
 
-unsigned char* Encryption::decryptString(unsigned char* passwd, unsigned char* decryptText, int *len)
+unsigned char* Encryption::decryptString(std::string passwd, unsigned char* decryptText, int *len)
 {
     EVP_CIPHER_CTX ctx;
     EVP_CIPHER_CTX_init(&ctx);
@@ -42,7 +42,7 @@ unsigned char* Encryption::decryptString(unsigned char* passwd, unsigned char* d
     const EVP_CIPHER *cipher = EVP_aes_128_cbc();
     unsigned char key1[16];
 
-    generateKey(passwd, std::strlen((const char*)passwd), key1);
+    generateKey(passwd, key1);
 
     EVP_DecryptInit(&ctx, cipher, key1, key1);
 
@@ -60,12 +60,12 @@ unsigned char* Encryption::decryptString(unsigned char* passwd, unsigned char* d
     return out;
 }
 
-void Encryption::generateKey(unsigned char *passwd, int passlen, unsigned char *key)
+void Encryption::generateKey(std::string passwd, unsigned char *key)
 {
     const unsigned char salt[] = "ThisIsSomeRandomSalt";
     const int saltlen = 20;
     int iter = 10000;
     int keylen = 16; // For 128 bit encryption
 
-    PKCS5_PBKDF2_HMAC_SHA1((const char*)passwd, passlen, salt, saltlen, iter, keylen, key);
+    PKCS5_PBKDF2_HMAC_SHA1(static_cast<const char*>(passwd.c_str()), passwd.length(), salt, saltlen, iter, keylen, key);
 }

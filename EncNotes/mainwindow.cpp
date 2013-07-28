@@ -51,7 +51,7 @@ void MainWindow::createWidgets()
 
     Encryption *encryption = new Encryption();
     unsigned char message[] = "This is a test";
-    unsigned char passwd[] = "ankitrohatgi";
+    std::string passwd = "ankitrohatgi";
     int len = 15;
     unsigned char* encryptedString = encryption->encryptString(passwd, message, &len);
     unsigned char* decryptedString = encryption->decryptString(passwd, encryptedString, &len);
@@ -75,11 +75,13 @@ void MainWindow::fileOpen()
         fileManager->openFile(fileName.toStdString());
 
         Encryption *encryption = new Encryption();
-        unsigned char passwd[] = "ankitrohatgi";
-        unsigned char *encryptedText = (unsigned char*)fileManager->getContent().c_str();
-        int len = std::strlen((const char*)encryptedText);
+        std::string passwd = "ankitrohatgi";
+        int len;
+
+        unsigned char *encryptedText = fileManager->getContent(&len);
         unsigned char *decryptedText = encryption->decryptString(passwd, encryptedText, &len);
-        QString contents = QString::fromUtf8((const char*)decryptedText, std::strlen((const char*)decryptedText));
+
+        QString contents = QString::fromUtf8((const char*)decryptedText, len);
         textEdit->setText(contents);
         delete[] encryption;
     }
@@ -88,12 +90,13 @@ void MainWindow::fileOpen()
 void MainWindow::fileSave()
 {
     Encryption *encryption = new Encryption();
-    unsigned char passwd[] = "ankitrohatgi";
+    std::string passwd = "ankitrohatgi";
     unsigned char *text = (unsigned char*)textEdit->toPlainText().toStdString().c_str();
     int len = std::strlen((const char*)text);
+
     unsigned char *encryptedText = encryption->encryptString(passwd, text, &len);
-    std::string encryptedTextString((char *)encryptedText, std::strlen((const char*)encryptedText));
-    fileManager->setContent(encryptedTextString);
+
+    fileManager->setContent(encryptedText, len);
     fileManager->save();
     delete[] encryption;
 }
@@ -107,12 +110,13 @@ void MainWindow::fileSaveAs()
     if(!fileName.isEmpty())
     {
         Encryption *encryption = new Encryption();
-        unsigned char passwd[] = "ankitrohatgi";
+        std::string passwd = "ankitrohatgi";
         unsigned char *text = (unsigned char*)textEdit->toPlainText().toStdString().c_str();
         int len = std::strlen((const char*)text);
+
         unsigned char *encryptedText = encryption->encryptString(passwd, text, &len);
-        std::string encryptedTextString((char *)encryptedText, std::strlen((const char*)encryptedText));
-        fileManager->setContent(encryptedTextString);
+
+        fileManager->setContent(encryptedText, len);
         fileManager->saveas(fileName.toStdString());
         delete[] encryption;
     }

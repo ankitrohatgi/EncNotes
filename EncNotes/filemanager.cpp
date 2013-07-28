@@ -3,7 +3,7 @@
 #include <iostream>
 FileManager::FileManager()
 {
-
+    contents = NULL;
 }
 
 bool FileManager::openFile(std::string fileName)
@@ -13,22 +13,26 @@ bool FileManager::openFile(std::string fileName)
     if(fhandle)
     {
         fhandle.seekg(0, std::ios::end);
-        contents.resize(fhandle.tellg());
+        contentLength = fhandle.tellg();
         fhandle.seekg(0, std::ios::beg);
-        fhandle.read(&contents[0], contents.size());
+        contents = new unsigned char[contentLength];
+        fhandle.read(reinterpret_cast<char *>(contents), contentLength);
         fhandle.close();
+        std::cout << contents << contentLength << std::endl;
         return true;
     }
     return false;
 }
 
-std::string FileManager::getContent()
+unsigned char* FileManager::getContent(int *len)
 {
+    *len = contentLength;
     return contents;
 }
 
-void FileManager::setContent(std::string content)
+void FileManager::setContent(unsigned char* content, int len)
 {
+
     contents = content;
 }
 
@@ -50,12 +54,11 @@ bool FileManager::saveas(std::string newFilename)
     return false;
 }
 
-void FileManager::close()
-{
-
-}
-
 FileManager::~FileManager()
 {
-    this->close();
+    if(contents!=NULL)
+    {
+        delete[] contents;
+        contents = NULL;
+    }
 }

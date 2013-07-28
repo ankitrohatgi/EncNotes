@@ -6,12 +6,13 @@ class FileManager
 {
 private:
     std::string fileNameWithPath;
-    std::string contents;
+    unsigned char* contents;
+    int contentLength;
 
 public:
     FileManager();
-    std::string getContent();
-    void setContent(std::string content);
+    unsigned char* getContent(int *len);
+    void setContent(unsigned char* content, int len);
     bool openFile(std::string fileName);
     bool save();
     bool saveas(std::string newFilename);

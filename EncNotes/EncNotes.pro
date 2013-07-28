@@ -18,6 +18,6 @@ HEADERS  += mainwindow.h \
 RESOURCES += \
     icons.qrc
 
-ICON = icons/test.icns
+ICON = icons/icon.icns
 
 LIBS += -lcrypto

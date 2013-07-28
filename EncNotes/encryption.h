@@ -7,10 +7,10 @@ class Encryption
 {
 public:
     Encryption();
-    unsigned char* encryptString(unsigned char* passwd, unsigned char* plainText, int *len);
-    unsigned char* decryptString(unsigned char* passwd, unsigned char* decryptText, int *len);
+    unsigned char* encryptString(std::string passwd, unsigned char* plainText, int *len);
+    unsigned char* decryptString(std::string passwd, unsigned char* decryptText, int *len);
 private:
-    void generateKey(unsigned char* passwd, int passlen, unsigned char *key);
+    void generateKey(std::string passwd, unsigned char *key);
 };
 
 #endif // ENCRYPTION_H
