@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "filemanager.h"
+#include "encryption.h"
 
 class QTextEdit;
 
@@ -11,7 +12,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     QTextEdit *textEdit;
-
+    Encryption *encryption;
     FileManager *fileManager;
 
 public:

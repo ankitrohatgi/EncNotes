@@ -11,12 +11,17 @@ private:
 
 public:
     FileManager();
+
+    bool hasFileName();
+    void setFileName(std::string filename);
+
     unsigned char* getContent(int *len);
     void setContent(unsigned char* content, int len);
-    bool openFile(std::string fileName);
+    bool open();
     bool save();
-    bool saveas(std::string newFilename);
+    bool saveAs(std::string newFilename);
     void close();
+
     ~FileManager();
 
     bool isModified;

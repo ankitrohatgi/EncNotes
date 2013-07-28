@@ -1,6 +1,4 @@
 #include "mainwindow.h"
-#include "filemanager.h"
-#include "encryption.h"
 
 #include <QMenu>
 #include <QAction>
@@ -9,13 +7,15 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStyle>
+#include <QInputDialog>
 
 MainWindow::MainWindow()
 {
     createMenus();
     createWidgets();
 
-    fileManager = new FileManager();
+    fileManager = NULL;
+    encryption = NULL;
 }
 
 void MainWindow::createMenus()
@@ -48,15 +48,6 @@ void MainWindow::createWidgets()
     textEdit = new QTextEdit(this);
     textEdit->setMinimumSize(400, 400);
     setCentralWidget(textEdit);
-
-    Encryption *encryption = new Encryption();
-    unsigned char message[] = "This is a test";
-    std::string passwd = "ankitrohatgi";
-    int len = 15;
-    unsigned char* encryptedString = encryption->encryptString(passwd, message, &len);
-    unsigned char* decryptedString = encryption->decryptString(passwd, encryptedString, &len);
-    textEdit->setText(QString::fromUtf8((const char*)decryptedString, len));
-    delete[] encryption;
 }
 
 void MainWindow::fileNew()
@@ -70,58 +61,101 @@ void MainWindow::fileOpen()
                                                     tr("Open File"),
                                                     QString(),
                                                     tr("All Files (*);;Text Files (*.txt)"));
-    if(!fileName.isEmpty())
+    if(fileName.isEmpty()) return;
+
+    if(fileManager == NULL) fileManager = new FileManager();
+
+    fileManager->setFileName(fileName.toStdString());
+    if(!fileManager->open()) return;
+
+    bool ok;
+    QString passwdQString = QInputDialog::getText(this, tr("Password"), tr("Enter a password: "), QLineEdit::Password, tr(""), &ok);
+
+    if(!ok) return;
+
+    if(encryption == NULL)
     {
-        fileManager->openFile(fileName.toStdString());
-
-        Encryption *encryption = new Encryption();
-        std::string passwd = "ankitrohatgi";
-        int len;
-
-        unsigned char *encryptedText = fileManager->getContent(&len);
-        unsigned char *decryptedText = encryption->decryptString(passwd, encryptedText, &len);
-
-        QString contents = QString::fromUtf8((const char*)decryptedText, len);
-        textEdit->setText(contents);
-        delete[] encryption;
+        encryption = new Encryption();
     }
+
+    encryption->setPassword(passwdQString.toStdString());
+
+    int len;
+
+    unsigned char *encryptedText = fileManager->getContent(&len);
+
+    unsigned char *decryptedText = encryption->decryptString(encryptedText, &len);
+
+    QString contents = QString::fromUtf8((const char*)decryptedText, len);
+    textEdit->setText(contents);
+
 }
 
 void MainWindow::fileSave()
 {
-    Encryption *encryption = new Encryption();
-    std::string passwd = "ankitrohatgi";
+    if(fileManager == NULL)
+        fileManager = new FileManager();
+
+    if(!fileManager->hasFileName())
+    {
+        QString fileName = QFileDialog::getSaveFileName(this,
+                                                        tr("Save File"),
+                                                        QString(),
+                                                        tr("All Files (*);;Text Files (*.txt)"));
+        if(fileName.isEmpty()) return;
+
+        fileManager->setFileName(fileName.toStdString());
+    }
+
+    if(encryption == NULL)
+    {
+        bool ok;
+        QString passwdQString = QInputDialog::getText(this, tr("Password"), tr("Enter a password: "), QLineEdit::Password, tr(""), &ok);
+        if(!ok) return;
+
+        encryption = new Encryption();
+        encryption->setPassword(passwdQString.toStdString());
+    }
+
     unsigned char *text = (unsigned char*)textEdit->toPlainText().toStdString().c_str();
     int len = std::strlen((const char*)text);
 
-    unsigned char *encryptedText = encryption->encryptString(passwd, text, &len);
+    unsigned char *encryptedText = encryption->encryptString(text, &len);
 
     fileManager->setContent(encryptedText, len);
     fileManager->save();
-    delete[] encryption;
 }
 
 void MainWindow::fileSaveAs()
 {
+
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     tr("Save File"),
                                                     QString(),
                                                     tr("All Files (*);;Text Files (*.txt)"));
-    if(!fileName.isEmpty())
+    if(fileName.isEmpty()) return;
+
+    bool ok;
+    QString passwdQString = QInputDialog::getText(this, tr("Password"), tr("Enter a password: "), QLineEdit::Password, tr(""), &ok);
+
+    if(!ok) return;
+
+    if(encryption == NULL)
     {
-        Encryption *encryption = new Encryption();
-        std::string passwd = "ankitrohatgi";
-        unsigned char *text = (unsigned char*)textEdit->toPlainText().toStdString().c_str();
-        int len = std::strlen((const char*)text);
-
-        unsigned char *encryptedText = encryption->encryptString(passwd, text, &len);
-
-        fileManager->setContent(encryptedText, len);
-        fileManager->saveas(fileName.toStdString());
-        delete[] encryption;
+        encryption = new Encryption();
     }
+    encryption->setPassword(passwdQString.toStdString());
 
+    unsigned char *text = (unsigned char*)textEdit->toPlainText().toStdString().c_str();
+    int len = std::strlen((const char*)text);
 
+    unsigned char *encryptedText = encryption->encryptString(text, &len);
+
+    if(fileManager == NULL)
+        fileManager = new FileManager();
+
+    fileManager->setContent(encryptedText, len);
+    fileManager->saveAs(fileName.toStdString());
 }
 
 void MainWindow::helpAbout()
@@ -134,5 +168,6 @@ void MainWindow::helpAbout()
 
 MainWindow::~MainWindow()
 {
-    delete fileManager;
+    if(fileManager != NULL) delete fileManager;
+    if(encryption != NULL) delete encryption;
 }
