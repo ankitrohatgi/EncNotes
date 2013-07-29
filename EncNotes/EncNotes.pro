@@ -20,4 +20,13 @@ RESOURCES += \
 
 ICON = icons/icon.icns
 
-LIBS += -lcrypto
+unix {
+    LIBS += -lcrypto
+}
+
+win32 {
+    INCLUDEPATH += "C:\OpenSSL-Win32\include"
+    DEPENDPATH += "C:\OpenSSL-Win32\include"
+    LIBS += -L"C:/OpenSSL-Win32/lib/" -llibeay32 -lssleay32
+}
+

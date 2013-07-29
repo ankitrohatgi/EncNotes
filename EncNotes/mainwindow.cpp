@@ -117,13 +117,18 @@ void MainWindow::fileSave()
         encryption->setPassword(passwdQString.toStdString());
     }
 
-    unsigned char *text = (unsigned char*)textEdit->toPlainText().toStdString().c_str();
-    int len = std::strlen((const char*)text);
+
+    std::string textString = textEdit->toPlainText().toStdString();
+    int len = textString.length();
+    unsigned char *text = new unsigned char[len];
+    std::memcpy(text, textString.c_str(), len);
 
     unsigned char *encryptedText = encryption->encryptString(text, &len);
 
     fileManager->setContent(encryptedText, len);
     fileManager->save();
+
+    delete[] text;
 }
 
 void MainWindow::fileSaveAs()
@@ -146,8 +151,10 @@ void MainWindow::fileSaveAs()
     }
     encryption->setPassword(passwdQString.toStdString());
 
-    unsigned char *text = (unsigned char*)textEdit->toPlainText().toStdString().c_str();
-    int len = std::strlen((const char*)text);
+    std::string textString = textEdit->toPlainText().toStdString();
+    int len = textString.length();
+    unsigned char *text = new unsigned char[len];
+    std::memcpy(text, textString.c_str(), len);
 
     unsigned char *encryptedText = encryption->encryptString(text, &len);
 
@@ -156,6 +163,7 @@ void MainWindow::fileSaveAs()
 
     fileManager->setContent(encryptedText, len);
     fileManager->saveAs(fileName.toStdString());
+    delete[] text;
 }
 
 void MainWindow::helpAbout()
