@@ -80,6 +80,8 @@ void MainWindow::createWidgets()
     textEdit = new QTextEdit(this);
     textEdit->setMinimumSize(400, 400);
     setCentralWidget(textEdit);
+
+    this->setWindowTitle(QString("EncNotes - Ankit Rohatgi (2013)"));
 }
 
 void MainWindow::fileNew()
@@ -206,7 +208,7 @@ void MainWindow::helpAbout()
 {
     QMessageBox *aboutMessage = new QMessageBox(this);
     aboutMessage->setWindowTitle(tr("About EncryptedNotepad"));
-    aboutMessage->setText(tr("<p>EncryptedNotepad is a small tool written to learn QT</p><p>Author: Ankit Rohatgi &lt;ankitrohatgi@hotmail.com&gt;</p>"));
+    aboutMessage->setText(tr("<p>EncNotes is a small text encryption tool written to learn QT</p><p>Author: Ankit Rohatgi &lt;ankitrohatgi@hotmail.com&gt;</p>"));
     aboutMessage->show();
 }
 
