@@ -9,6 +9,7 @@
 #include <QStyle>
 #include <QInputDialog>
 #include <QToolBar>
+#include <cstring>
 
 MainWindow::MainWindow()
 {
