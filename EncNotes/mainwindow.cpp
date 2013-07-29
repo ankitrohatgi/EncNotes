@@ -8,39 +8,71 @@
 #include <QMessageBox>
 #include <QStyle>
 #include <QInputDialog>
+#include <QToolBar>
 
 MainWindow::MainWindow()
 {
+    createActions();
     createMenus();
     createWidgets();
+    createToolbar();
 
     fileManager = NULL;
     encryption = NULL;
 }
 
+void MainWindow::createActions()
+{
+    newAction = new QAction(style()->standardIcon(QStyle::SP_FileIcon), tr("&New"), this);
+    newAction->setShortcuts(QKeySequence::New);
+    newAction->setStatusTip(tr("New file"));
+    connect(newAction, SIGNAL(triggered()), this, SLOT(fileNew()));
+
+    openAction = new QAction(style()->standardIcon(QStyle::SP_FileDialogStart), tr("&Open"), this);
+    openAction->setShortcuts(QKeySequence::Open);
+    openAction->setStatusTip(tr("Open a file"));
+    connect(openAction, SIGNAL(triggered()), this, SLOT(fileOpen()));
+
+    saveAction = new QAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&Save"), this);
+    saveAction->setShortcuts(QKeySequence::Save);
+    saveAction->setStatusTip(tr("Save file"));
+    connect(saveAction, SIGNAL(triggered()), this, SLOT(fileSave()));
+
+    saveAsAction = new QAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("Save &As"), this);
+    saveAsAction->setShortcuts(QKeySequence::SaveAs);
+    saveAsAction->setStatusTip(tr("Save file as"));
+    connect(saveAsAction, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
+
+    aboutAction = new QAction(style()->standardIcon(QStyle::SP_DialogSaveButton), tr("&About"), this);
+    connect(aboutAction, SIGNAL(triggered()), this, SLOT(helpAbout()));
+
+    quitAction = new QAction(style()->standardIcon(QStyle::SP_BrowserStop), tr("&Quit"), this);
+    quitAction->setShortcuts(QKeySequence::Quit);
+    quitAction->setStatusTip(tr("Quit"));
+    connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
+}
+
 void MainWindow::createMenus()
 {
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    QAction *newAction = fileMenu->addAction(tr("&New"));
-    newAction->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
-    connect(newAction, SIGNAL(triggered()), this, SLOT(fileNew()));
-
-    QAction *openAction = fileMenu->addAction(tr("&Open"));
-    openAction->setIcon(style()->standardIcon(QStyle::SP_FileDialogStart));
-    connect(openAction, SIGNAL(triggered()), this, SLOT(fileOpen()));
-
-    QAction *saveAction = fileMenu->addAction(tr("&Save"));
-    saveAction->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
-    connect(saveAction, SIGNAL(triggered()), this, SLOT(fileSave()));
-
-    QAction *saveAsAction = fileMenu->addAction(tr("Save &As"));
-    saveAsAction->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
-    connect(saveAsAction, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
-
+    fileMenu->addAction(newAction);
+    fileMenu->addAction(openAction);
+    fileMenu->addAction(saveAction);
+    fileMenu->addAction(saveAsAction);
+    fileMenu->addAction(quitAction);
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
-    QAction *aboutAction = helpMenu->addAction(tr("&About"));
-    connect(aboutAction, SIGNAL(triggered()), this, SLOT(helpAbout()));
+    helpMenu->addAction(aboutAction);
+}
+
+void MainWindow::createToolbar()
+{
+    QToolBar *fileToolbar = addToolBar(tr("File"));
+    fileToolbar->setIconSize(QSize(16,16));
+    fileToolbar->addAction(newAction);
+    fileToolbar->addAction(openAction);
+    fileToolbar->addAction(saveAction);
+    fileToolbar->addAction(quitAction);
 }
 
 void MainWindow::createWidgets()
@@ -53,6 +85,8 @@ void MainWindow::createWidgets()
 void MainWindow::fileNew()
 {
     textEdit->clear();
+    if(fileManager != NULL) delete fileManager;
+    if(encryption != NULL) delete encryption;
 }
 
 void MainWindow::fileOpen()
@@ -88,7 +122,7 @@ void MainWindow::fileOpen()
 
     QString contents = QString::fromUtf8((const char*)decryptedText, len);
     textEdit->setText(contents);
-
+    delete[] decryptedText;
 }
 
 void MainWindow::fileSave()
@@ -129,6 +163,7 @@ void MainWindow::fileSave()
     fileManager->save();
 
     delete[] text;
+    delete[] encryptedText;
 }
 
 void MainWindow::fileSaveAs()
@@ -164,6 +199,7 @@ void MainWindow::fileSaveAs()
     fileManager->setContent(encryptedText, len);
     fileManager->saveAs(fileName.toStdString());
     delete[] text;
+    delete[] encryptedText;
 }
 
 void MainWindow::helpAbout()

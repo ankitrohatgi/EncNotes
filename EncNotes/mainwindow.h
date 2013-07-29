@@ -6,6 +6,7 @@
 #include "encryption.h"
 
 class QTextEdit;
+class QAction;
 
 class MainWindow : public QMainWindow
 {
@@ -15,12 +16,21 @@ class MainWindow : public QMainWindow
     Encryption *encryption;
     FileManager *fileManager;
 
+    QAction *newAction;
+    QAction *openAction;
+    QAction *saveAction;
+    QAction *saveAsAction;
+    QAction *quitAction;
+    QAction *aboutAction;
+
 public:
     MainWindow();
     ~MainWindow();
 
 private:
+    void createActions();
     void createMenus();
+    void createToolbar();
     void createWidgets();
 
 private slots:

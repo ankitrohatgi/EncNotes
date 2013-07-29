@@ -1,7 +1,6 @@
 #include "encryption.h"
 #include <openssl/evp.h>
 #include <string>
-#include <openssl/evp.h>
 
 Encryption::Encryption()
 {
