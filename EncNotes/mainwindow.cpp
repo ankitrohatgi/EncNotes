@@ -100,9 +100,16 @@ void MainWindow::fileOpen()
                                                     tr("All Files (*);;Text Files (*.txt)"));
     if(fileName.isEmpty()) return;
 
+    openFile(fileName.toStdString());
+}
+
+void MainWindow::openFile(std::string filename)
+{
+    if(filename.length() == 0) return;
+
     if(fileManager == NULL) fileManager = new FileManager();
 
-    fileManager->setFileName(fileName.toStdString());
+    fileManager->setFileName(filename);
     if(!fileManager->open()) return;
 
     bool ok;

@@ -25,6 +25,9 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
+
+    void openFile(std::string filename);
+
     ~MainWindow();
 
 private:
@@ -32,6 +35,7 @@ private:
     void createMenus();
     void createToolbar();
     void createWidgets();
+
 
 private slots:
     void fileNew();

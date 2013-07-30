@@ -57,8 +57,6 @@ bool FileManager::saveAs(std::string newFilename)
     fileNameWithPath = newFilename;
     std::ofstream fhandle(fileNameWithPath.c_str(), std::ios::out|std::ios::binary);
     if(!fhandle) return false;
-
-    //fhandle.seekg(0, std::ios::beg);
     fhandle.write(reinterpret_cast<char *>(contents), contentLength);
     fhandle.close();
     return true;
