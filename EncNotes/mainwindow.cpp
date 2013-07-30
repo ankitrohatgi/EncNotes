@@ -173,7 +173,6 @@ void MainWindow::fileSave()
     fileManager->save();
 
     delete[] text;
-    delete[] encryptedText;
 }
 
 void MainWindow::fileSaveAs()
@@ -209,7 +208,6 @@ void MainWindow::fileSaveAs()
     fileManager->setContent(encryptedText, len);
     fileManager->saveAs(fileName.toStdString());
     delete[] text;
-    delete[] encryptedText;
 }
 
 void MainWindow::helpAbout()
