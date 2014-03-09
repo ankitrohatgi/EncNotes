@@ -10,6 +10,7 @@
 #include <QInputDialog>
 #include <QToolBar>
 #include <cstring>
+#include <QSettings>
 
 MainWindow::MainWindow()
 {
@@ -94,11 +95,17 @@ void MainWindow::fileNew()
 
 void MainWindow::fileOpen()
 {
+    const QString DEFAULT_DIR_KEY("default_dir");
+    QSettings mySettings;
+
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Open File"),
-                                                    QString(),
+                                                    mySettings.value(DEFAULT_DIR_KEY).toString(),
                                                     tr("All Files (*);;Text Files (*.txt)"));
     if(fileName.isEmpty()) return;
+
+    QDir CurrentDir;
+    mySettings.setValue(DEFAULT_DIR_KEY, CurrentDir.absoluteFilePath(fileName));
 
     openFile(fileName.toStdString());
 }

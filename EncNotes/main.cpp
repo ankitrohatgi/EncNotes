@@ -5,6 +5,10 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    app.setOrganizationName("Rohatgi");
+    app.setApplicationName("EncNotes");
+    app.setOrganizationDomain("arohatgi.info");
+
     app.setWindowIcon(QIcon(":/icons/application-icon.png"));
     MainWindow m;
     if(app.arguments().length() == 2)
