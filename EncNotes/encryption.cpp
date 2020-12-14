@@ -14,8 +14,8 @@ void Encryption::setPassword(std::string passwd)
 
 unsigned char* Encryption::encryptString(unsigned char* plainText, int *len)
 {
-    EVP_CIPHER_CTX ctx;
-    EVP_CIPHER_CTX_init(&ctx);
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX_init(ctx);
 
     const EVP_CIPHER *cipher = EVP_aes_128_cbc();
 
@@ -23,16 +23,16 @@ unsigned char* Encryption::encryptString(unsigned char* plainText, int *len)
 
     generateKey(key1);
 
-    EVP_EncryptInit(&ctx, cipher, key1, key1);
+    EVP_EncryptInit(ctx, cipher, key1, key1);
 
     unsigned char *out = new unsigned char[*len+16];
     int outlen, flen;
 
-    EVP_EncryptUpdate(&ctx, out, &outlen, plainText, *len);
+    EVP_EncryptUpdate(ctx, out, &outlen, plainText, *len);
 
-    EVP_EncryptFinal(&ctx, out + outlen, &flen);
+    EVP_EncryptFinal(ctx, out + outlen, &flen);
 
-    EVP_CIPHER_CTX_cleanup(&ctx);
+    EVP_CIPHER_CTX_free(ctx);
 
     *len = outlen + flen;
 
@@ -41,24 +41,24 @@ unsigned char* Encryption::encryptString(unsigned char* plainText, int *len)
 
 unsigned char* Encryption::decryptString(unsigned char* decryptText, int *len)
 {
-    EVP_CIPHER_CTX ctx;
-    EVP_CIPHER_CTX_init(&ctx);
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX_init(ctx);
 
     const EVP_CIPHER *cipher = EVP_aes_128_cbc();
     unsigned char key1[16];
 
     generateKey(key1);
 
-    EVP_DecryptInit(&ctx, cipher, key1, key1);
+    EVP_DecryptInit(ctx, cipher, key1, key1);
 
     unsigned char *out = new unsigned char[*len+16];
     int outlen, flen;
 
-    EVP_DecryptUpdate(&ctx, out, &outlen, decryptText, *len);
+    EVP_DecryptUpdate(ctx, out, &outlen, decryptText, *len);
 
-    EVP_DecryptFinal(&ctx, out + outlen, &flen);
+    EVP_DecryptFinal(ctx, out + outlen, &flen);
 
-    EVP_CIPHER_CTX_cleanup(&ctx);
+    EVP_CIPHER_CTX_free(ctx);
 
     *len = outlen + flen;
 
